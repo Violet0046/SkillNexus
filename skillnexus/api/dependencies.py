@@ -11,6 +11,7 @@ from skillnexus.core.registry import SkillRegistry
 from skillnexus.llm.client import LLMClient
 from skillnexus.core.analyzer import ExecutionAnalyzer
 from skillnexus.core.evolver import SkillEvolver
+from skillnexus.recording.manager import RecordingManager
 from skillnexus.utils.logging import Logger
 
 logger = Logger.get_logger(__name__)
@@ -22,6 +23,7 @@ _llm_client: Optional[LLMClient] = None
 _analyzer: Optional[ExecutionAnalyzer] = None
 _evolver: Optional[SkillEvolver] = None
 _settings: Optional[Settings] = None
+_recording_manager: Optional[RecordingManager] = None
 
 
 def get_settings() -> Settings:
@@ -84,12 +86,25 @@ def get_evolver() -> SkillEvolver:
     return _evolver
 
 
+def get_recording_manager() -> RecordingManager:
+    global _recording_manager
+    if _recording_manager is None:
+        settings = get_settings()
+        _recording_manager = RecordingManager(
+            enabled=settings.recording.enabled,
+            log_dir=settings.recording.log_dir,
+            backends=settings.recording.backends,
+            enable_conversation_log=settings.recording.enable_conversation_log,
+        )
+    return _recording_manager
+
+
 def initialize(
     settings: Optional[Settings] = None,
     skill_dirs: Optional[list[Path]] = None,
 ) -> None:
     """Initialize all singletons. Call once at startup."""
-    global _settings, _store, _registry, _llm_client, _analyzer, _evolver
+    global _settings, _store, _registry, _llm_client, _analyzer, _evolver, _recording_manager
 
     _settings = settings or Settings.load()
     _store = SkillStore()
@@ -117,6 +132,13 @@ def initialize(
         store=_store,
         registry=_registry,
         llm_client=_llm_client,
+    )
+
+    _recording_manager = RecordingManager(
+        enabled=_settings.recording.enabled,
+        log_dir=_settings.recording.log_dir,
+        backends=_settings.recording.backends,
+        enable_conversation_log=_settings.recording.enable_conversation_log,
     )
 
     logger.info("SkillNexus initialized")

@@ -44,12 +44,22 @@ class EmbeddingConfig:
 
 
 @dataclass
+class RecordingConfig:
+    """Recording subsystem configuration."""
+    enabled: bool = True
+    log_dir: str = "./logs/recordings"
+    enable_conversation_log: bool = True
+    backends: List[str] = field(default_factory=lambda: ["mcp", "gui", "shell", "system", "web"])
+
+
+@dataclass
 class Settings:
     """Top-level settings for SkillNexus."""
     log_level: str = "INFO"
     skills: SkillConfig = field(default_factory=SkillConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
     embedding: EmbeddingConfig = field(default_factory=EmbeddingConfig)
+    recording: RecordingConfig = field(default_factory=RecordingConfig)
 
     @classmethod
     def load(cls, config_path: Optional[Path] = None) -> "Settings":
@@ -67,6 +77,7 @@ class Settings:
         skills_data = data.get("skills", {})
         llm_data = data.get("llm", {})
         embedding_data = data.get("embedding", {})
+        recording_data = data.get("recording", {})
 
         settings = cls(
             log_level=data.get("log_level", "INFO"),
@@ -87,6 +98,12 @@ class Settings:
                 api_base=embedding_data.get("api_base", ""),
                 api_key=embedding_data.get("api_key", ""),
                 model=embedding_data.get("model", "BAAI/bge-small-en-v1.5"),
+            ),
+            recording=RecordingConfig(
+                enabled=recording_data.get("enabled", True),
+                log_dir=recording_data.get("log_dir", "./logs/recordings"),
+                enable_conversation_log=recording_data.get("enable_conversation_log", True),
+                backends=recording_data.get("backends", ["mcp", "gui", "shell", "system", "web"]),
             ),
         )
 

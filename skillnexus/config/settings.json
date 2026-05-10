@@ -17,5 +17,11 @@
     "api_base": "",
     "api_key": "",
     "model": "BAAI/bge-small-en-v1.5"
+  },
+  "recording": {
+    "enabled": true,
+    "log_dir": "./logs/recordings",
+    "enable_conversation_log": true,
+    "backends": ["mcp", "gui", "shell", "system", "web"]
   }
 }
