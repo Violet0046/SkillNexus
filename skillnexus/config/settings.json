@@ -1,0 +1,21 @@
+{
+  "log_level": "INFO",
+  "skills": {
+    "enabled": true,
+    "skill_dirs": ["./skills"],
+    "max_select": 2
+  },
+  "llm": {
+    "model": "anthropic/mimo-v2.5-pro",
+    "enable_thinking": false,
+    "rate_limit_delay": 0.0,
+    "max_retries": 3,
+    "retry_delay": 1.0,
+    "timeout": 120.0
+  },
+  "embedding": {
+    "api_base": "",
+    "api_key": "",
+    "model": "BAAI/bge-small-en-v1.5"
+  }
+}
